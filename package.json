@@ -1,0 +1,32 @@
+{
+  "name": "@socketo/sdk",
+  "type": "module",
+  "private": true,
+  "version": "0.0.0",
+  "author": "eckoln",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsup --clean",
+    "format": "bunx biome format --write ./src/*"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "browser": false,
+  "devDependencies": {
+    "@biomejs/biome": "2.2.3",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.2"
+  }
+}
