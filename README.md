@@ -7,13 +7,13 @@ The official TypeScript SDK for Socketo. Easily publish events from your server-
 Install the package using your package manager:
 
 ```bash
-npm install @socketo/sdk
+npm install @socketodev/sdk
 ```
 
 ## Usage
 
 ```ts
-import { Socketo } from "@socketo/sdk";
+import { Socketo } from "@socketodev/sdk";
 
 // Initialize client
 const socketo = new Socketo({
