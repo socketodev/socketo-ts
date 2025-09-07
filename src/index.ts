@@ -20,22 +20,32 @@ export class ApiClient {
     method: string,
     endpoint: string,
     data?: unknown,
-  ): Promise<T> {
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.secret}`,
-      },
-      body: data ? JSON.stringify(data) : undefined,
-    })
+  ): Promise<{
+    data: T | null
+    error: string | null
+  }> {
+    try {
+      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.secret}`,
+        },
+        body: data ? JSON.stringify(data) : undefined,
+      })
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: undefined }))
-      throw new Error(error.error || `Request failed: ${response.status}`)
+      if (!response.ok) {
+        throw new Error(`Request failed: ${response.status}`)
+      }
+
+      return { data: await response.json(), error: null }
+    } catch (error) {
+      return {
+        data: null,
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
+      }
     }
-
-    return response.json()
   }
 
   public get<T>(path: string) {
@@ -72,6 +82,6 @@ export class Socketo {
   }
 
   public publish(payload: PublishPayloadType) {
-    return this.client.post<object, PublishPayloadType>('/events', payload)
+    return this.client.post<void, PublishPayloadType>('/events', payload)
   }
 }
