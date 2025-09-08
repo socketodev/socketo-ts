@@ -1,49 +1,47 @@
-interface PublishPayload {
-  event: string
-  channels: string[]
-  data: string | object
-  socketId?: string | string[]
-}
+import type {
+  ApiReponseType,
+  PublishPayloadType,
+  PublishReponseType,
+} from './types'
 
-type PublishPayloadType = PublishPayload | PublishPayload[]
+const baseUrl = process?.env?.SOCKETO_API_URL ?? `https://api.socketo.dev`
 
-export class ApiClient {
-  private baseUrl: string
-  private secret: string
+class ApiClient {
+  private readonly baseUrl: string
 
-  constructor(options: { baseUrl: string; secret: string }) {
-    this.baseUrl = options.baseUrl
-    this.secret = options.secret
+  constructor(readonly options: { id: string; secret: string }) {
+    this.baseUrl = `${baseUrl}/apps/${options.id}`
   }
 
   private async request<T>(
     method: string,
     endpoint: string,
     data?: unknown,
-  ): Promise<{
-    data: T | null
-    error: string | null
-  }> {
+  ): Promise<ApiReponseType<T>> {
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         method,
         headers: {
+          Authorization: `Bearer ${this.options.secret}`,
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.secret}`,
         },
         body: data ? JSON.stringify(data) : undefined,
       })
 
       if (!response.ok) {
-        throw new Error(`Request failed: ${response.status}`)
+        throw new Error(
+          `Request failed: ${response.status} - ${response.statusText}`,
+        )
       }
 
       return { data: await response.json(), error: null }
     } catch (error) {
       return {
         data: null,
-        error:
-          error instanceof Error ? error.message : 'Unknown error occurred',
+        error: {
+          message:
+            error instanceof Error ? error.message : 'Unknown error occurred',
+        },
       }
     }
   }
@@ -52,7 +50,7 @@ export class ApiClient {
     return this.request<T>('GET', path)
   }
 
-  public post<T, D>(path: string, data: D) {
+  public post<T>(path: string, data: unknown) {
     return this.request<T>('POST', path, data)
   }
 }
@@ -60,7 +58,7 @@ export class ApiClient {
 export class Socketo {
   private client: ApiClient
 
-  constructor(options: { id: string; secret: string }) {
+  constructor(readonly options: { id: string; secret: string }) {
     const { id, secret } = options
 
     if (typeof window !== 'undefined') {
@@ -75,13 +73,10 @@ export class Socketo {
       throw new Error('Secret key is required')
     }
 
-    this.client = new ApiClient({
-      baseUrl: `https://api.socketo.dev/apps/${id}`,
-      secret: secret,
-    })
+    this.client = new ApiClient({ id, secret })
   }
 
-  public publish(payload: PublishPayloadType) {
-    return this.client.post<void, PublishPayloadType>('/events', payload)
+  public async publish(payload: PublishPayloadType) {
+    return this.client.post<PublishReponseType>('/events', payload)
   }
 }
