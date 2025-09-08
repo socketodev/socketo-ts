@@ -1,5 +1,6 @@
 import type {
   ApiReponseType,
+  ChannelsReponseType,
   PublishPayloadType,
   PublishReponseType,
 } from './types'
@@ -78,5 +79,9 @@ export class Socketo {
 
   public async publish(payload: PublishPayloadType) {
     return this.client.post<PublishReponseType>('/events', payload)
+  }
+
+  public async channels() {
+    return this.client.get<ChannelsReponseType>('/channels')
   }
 }

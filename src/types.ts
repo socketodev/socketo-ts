@@ -9,5 +9,11 @@ interface PublishPayload {
   socketId?: string | string[]
 }
 
+interface ChannelsReponse {
+  [channel: string]: string[]
+}
+
 export type PublishPayloadType = PublishPayload | PublishPayload[]
 export type PublishReponseType = undefined
+
+export type ChannelsReponseType = ChannelsReponse | object
