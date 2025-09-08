@@ -3,6 +3,7 @@ import type {
   ChannelsReponseType,
   PublishPayloadType,
   PublishReponseType,
+  SocketsReponseType,
 } from './types'
 
 const baseUrl = process?.env?.SOCKETO_API_URL ?? `https://api.socketo.dev`
@@ -83,5 +84,9 @@ export class Socketo {
 
   public async channels() {
     return this.client.get<ChannelsReponseType>('/channels')
+  }
+
+  public async sockets() {
+    return this.client.get<SocketsReponseType>('/sockets')
   }
 }

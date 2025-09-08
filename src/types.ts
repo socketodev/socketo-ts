@@ -17,3 +17,5 @@ export type PublishPayloadType = PublishPayload | PublishPayload[]
 export type PublishReponseType = undefined
 
 export type ChannelsReponseType = ChannelsReponse | object
+
+export type SocketsReponseType = number
